@@ -16,6 +16,7 @@ import { motion } from "framer-motion";
 import googleImage from "../assets/google.png";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 
 const RegisterForm = ({
   previousStep,
@@ -186,7 +187,10 @@ const RegisterForm = ({
           </div>
 
           {/* Google Button */}
-          <button className="flex items-center justify-center gap-3 border border-green-200 bg-green-50 hover:bg-green-100 text-green-600 font-medium p-3 rounded-xl transition">
+          <button
+            className="flex items-center justify-center gap-3 border border-green-200 bg-green-50 hover:bg-green-100 text-green-600 font-medium p-3 rounded-xl transition"
+            onClick={() => signIn("google")}
+          >
             <Image src={googleImage} width={20} height={20} alt="Google" />
             Continue with Google
           </button>
