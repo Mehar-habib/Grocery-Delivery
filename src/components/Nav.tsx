@@ -107,7 +107,7 @@ const Nav = ({ user }: { user: IUser }) => {
             {/* Navigation */}
             <nav className="flex flex-col gap-3 px-6 py-6 flex-1">
               <Link
-                href=""
+                href="/admin/add-grocery"
                 className="flex items-center gap-3 px-4 py-3 rounded-xl
               bg-white/5 hover:bg-white/15 transition-all duration-200"
               >
@@ -203,7 +203,7 @@ const Nav = ({ user }: { user: IUser }) => {
             <>
               <div className="hidden md:flex items-center gap-4">
                 <Link
-                  href={""}
+                  href={"/admin/add-grocery"}
                   className="flex items-center gap-2 bg-white text-green-700 font-semibold px-4 py-2 rounded-full hover:bg-green-100 transition-all"
                 >
                   <PlusCircle className="h-5 w-5" />
