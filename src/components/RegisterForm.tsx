@@ -44,7 +44,7 @@ const RegisterForm = ({
         email,
         password,
       });
-      console.log(result.data);
+      router.push("/login");
       setLoading(false);
     } catch (error) {
       console.error(error);
@@ -187,13 +187,13 @@ const RegisterForm = ({
           </div>
 
           {/* Google Button */}
-          <button
+          <div
             className="flex items-center justify-center gap-3 border border-green-200 bg-green-50 hover:bg-green-100 text-green-600 font-medium p-3 rounded-xl transition"
-            onClick={() => signIn("google")}
+            onClick={() => signIn("google", { callbackUrl: "/" })}
           >
             <Image src={googleImage} width={20} height={20} alt="Google" />
             Continue with Google
-          </button>
+          </div>
         </motion.form>
 
         {/* Sign In */}
