@@ -22,7 +22,7 @@ const EditRoleAndMobile = () => {
   const [loading, setLoading] = useState(false);
 
   const handleEdit = async () => {
-    if (!selectedRole || mobile.length !== 10) return;
+    if (!selectedRole || mobile.length !== 11) return;
 
     try {
       setLoading(true);
@@ -39,7 +39,7 @@ const EditRoleAndMobile = () => {
     }
   };
 
-  const isValid = selectedRole && mobile.length === 10;
+  const isValid = selectedRole && mobile.length === 11;
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-green-50 via-white to-orange-50 px-6 py-10">
@@ -116,7 +116,7 @@ const EditRoleAndMobile = () => {
         whileTap={{ scale: 0.97 }}
         disabled={!isValid || loading}
         onClick={handleEdit}
-        className={`mt-10 w-full max-w-md flex items-center justify-center gap-2 font-semibold p-3 rounded-xl transition-all duration-300 shadow-md
+        className={`mt-10 w-full max-w-md flex items-center justify-center gap-2 font-semibold p-3 rounded-xl transition-all duration-300 shadow-md cursor-pointer
           ${
             isValid
               ? "bg-green-600 hover:bg-green-700 text-white hover:shadow-lg"

@@ -1,12 +1,24 @@
 "use client";
 
-import { LogOut, Package, Search, ShoppingCart, User, X } from "lucide-react";
+import {
+  Boxes,
+  ClipboardCheck,
+  LogOut,
+  Menu,
+  Package,
+  PlusCircle,
+  Search,
+  ShoppingCart,
+  User,
+  X,
+} from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { signOut } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import mongoose from "mongoose";
+import { createPortal } from "react-dom";
 
 interface IUser {
   _id?: mongoose.Types.ObjectId;
@@ -21,6 +33,7 @@ interface IUser {
 const Nav = ({ user }: { user: IUser }) => {
   const [open, setOpen] = useState(false);
   const [searchBarOpen, setSearchBarOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const profileDropDown = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -36,6 +49,108 @@ const Nav = ({ user }: { user: IUser }) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const SideBar = menuOpen
+    ? createPortal(
+        <AnimatePresence>
+          {/* Overlay */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setMenuOpen(false)}
+            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[9998]"
+          />
+
+          {/* Drawer */}
+          <motion.aside
+            initial={{ x: -320 }}
+            animate={{ x: 0 }}
+            exit={{ x: -320 }}
+            transition={{ type: "spring", stiffness: 120, damping: 18 }}
+            className="fixed top-0 left-0 h-full w-[80%] sm:w-[60%] lg:w-[350px] z-[9999]
+          bg-gradient-to-b from-green-900 via-green-800 to-green-950
+          shadow-2xl border-r border-white/10
+          flex flex-col text-white"
+          >
+            {/* Header */}
+            <div className="flex justify-between items-center px-6 py-5 border-b border-white/10">
+              <h1 className="font-bold text-xl tracking-wide">Admin Panel</h1>
+              <button
+                onClick={() => setMenuOpen(false)}
+                className="p-2 rounded-full hover:bg-white/10 transition"
+              >
+                <X size={22} />
+              </button>
+            </div>
+
+            {/* Profile */}
+            <div className="flex flex-col items-center text-center px-6 py-6 border-b border-white/10">
+              <div className="relative w-20 h-20 rounded-full overflow-hidden border-2 border-green-400 shadow-lg">
+                {user.image ? (
+                  <Image
+                    src={user.image}
+                    alt="profile"
+                    fill
+                    className="object-cover"
+                  />
+                ) : (
+                  <div className="flex items-center justify-center w-full h-full bg-green-700">
+                    <User size={28} />
+                  </div>
+                )}
+              </div>
+
+              <h2 className="mt-4 font-semibold text-lg">{user.name}</h2>
+              <p className="text-sm text-green-300 capitalize">{user.role}</p>
+            </div>
+
+            {/* Navigation */}
+            <nav className="flex flex-col gap-3 px-6 py-6 flex-1">
+              <Link
+                href=""
+                className="flex items-center gap-3 px-4 py-3 rounded-xl
+              bg-white/5 hover:bg-white/15 transition-all duration-200"
+              >
+                <PlusCircle size={20} />
+                <span>Add Grocery</span>
+              </Link>
+
+              <Link
+                href=""
+                className="flex items-center gap-3 px-4 py-3 rounded-xl
+              bg-white/5 hover:bg-white/15 transition-all duration-200"
+              >
+                <Boxes size={20} />
+                <span>View Grocery</span>
+              </Link>
+
+              <Link
+                href=""
+                className="flex items-center gap-3 px-4 py-3 rounded-xl
+              bg-white/5 hover:bg-white/15 transition-all duration-200"
+              >
+                <ClipboardCheck size={20} />
+                <span>Manage Orders</span>
+              </Link>
+            </nav>
+
+            {/* Logout */}
+            <div className="px-6 pb-8">
+              <button
+                onClick={() => signOut({ callbackUrl: "/login" })}
+                className="w-full flex items-center justify-center gap-2
+              bg-red-500 hover:bg-red-600
+              py-3 rounded-xl font-semibold transition-all shadow-lg"
+              >
+                <LogOut size={18} />
+                Logout
+              </button>
+            </div>
+          </motion.aside>
+        </AnimatePresence>,
+        document.body,
+      )
+    : null;
   return (
     <nav className="fixed top-4 left-1/2 -translate-x-1/2 w-[95%] z-50">
       <div className="backdrop-blur-xl bg-white/70 border border-white/40 shadow-2xl rounded-2xl px-6 py-4 flex items-center justify-between">
@@ -48,35 +163,75 @@ const Nav = ({ user }: { user: IUser }) => {
         </Link>
 
         {/* Desktop Search */}
-        <form className="hidden md:flex items-center gap-3 bg-white/80 border border-gray-200 rounded-xl px-4 py-2 w-[350px] focus-within:ring-2 focus-within:ring-green-400 transition">
-          <Search size={18} className="text-gray-400" />
-          <input
-            type="text"
-            placeholder="Search groceries..."
-            className="outline-none bg-transparent text-sm w-full"
-          />
-        </form>
+        {user.role === "user" && (
+          <form className="hidden md:flex items-center gap-3 bg-white/80 border border-gray-200 rounded-xl px-4 py-2 w-[350px] focus-within:ring-2 focus-within:ring-green-400 transition">
+            <Search size={18} className="text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search groceries..."
+              className="outline-none bg-transparent text-sm w-full"
+            />
+          </form>
+        )}
 
         {/* Right Section */}
         <div className="flex items-center gap-5 relative">
           {/* Mobile Search Icon */}
-          <button
-            className="md:hidden text-gray-600 hover:text-green-600 transition"
-            onClick={() => setSearchBarOpen(true)}
-          >
-            <Search size={22} />
-          </button>
+          {user.role === "user" && (
+            <>
+              <button
+                className="md:hidden text-gray-600 hover:text-green-600 transition"
+                onClick={() => setSearchBarOpen(true)}
+              >
+                <Search size={22} />
+              </button>
 
-          {/* Cart */}
-          <Link
-            href="/cart"
-            className="relative text-gray-600 hover:text-green-600 transition"
-          >
-            <ShoppingCart size={22} />
-            <span className="absolute -top-2 -right-2 text-xs bg-green-600 text-white rounded-full px-1.5 py-0.5">
-              0
-            </span>
-          </Link>
+              {/* Cart */}
+              <Link
+                href="/cart"
+                className="relative text-gray-600 hover:text-green-600 transition"
+              >
+                <ShoppingCart size={22} />
+                <span className="absolute -top-2 -right-2 text-xs bg-green-600 text-white rounded-full px-1.5 py-0.5">
+                  0
+                </span>
+              </Link>
+            </>
+          )}
+
+          {user.role == "admin" && (
+            <>
+              <div className="hidden md:flex items-center gap-4">
+                <Link
+                  href={""}
+                  className="flex items-center gap-2 bg-white text-green-700 font-semibold px-4 py-2 rounded-full hover:bg-green-100 transition-all"
+                >
+                  <PlusCircle className="h-5 w-5" />
+                  Add Grocery
+                </Link>
+                <Link
+                  href={""}
+                  className="flex items-center gap-2 bg-white text-green-700 font-semibold px-4 py-2 rounded-full hover:bg-green-100 transition-all"
+                >
+                  <Boxes className="h-5 w-5" />
+                  View Grocery
+                </Link>
+                <Link
+                  href={""}
+                  className="flex items-center gap-2 bg-white text-green-700 font-semibold px-4 py-2 rounded-full hover:bg-green-100 transition-all"
+                >
+                  <ClipboardCheck className="h-5 w-5" />
+                  Menage Order
+                </Link>
+              </div>
+              <div
+                className="md:hidden bg-white rounded-full w-10 h-10 flex items-center justify-center shadow-md"
+                onClick={() => setMenuOpen((prev) => !prev)}
+              >
+                <Menu className="text-green-600 w-6 h-6" />
+              </div>
+            </>
+          )}
 
           {/* Profile */}
           <div ref={profileDropDown} className="relative">
@@ -135,14 +290,16 @@ const Nav = ({ user }: { user: IUser }) => {
                   <div className="h-px bg-gray-100" />
 
                   {/* Orders */}
-                  <Link
-                    href="/orders"
-                    onClick={() => setOpen(false)}
-                    className="flex items-center gap-2 text-gray-600 hover:text-green-600 transition"
-                  >
-                    <Package size={18} />
-                    My Orders
-                  </Link>
+                  {user.role === "user" && (
+                    <Link
+                      href="/orders"
+                      onClick={() => setOpen(false)}
+                      className="flex items-center gap-2 text-gray-600 hover:text-green-600 transition"
+                    >
+                      <Package size={18} />
+                      My Orders
+                    </Link>
+                  )}
 
                   {/* Logout */}
                   <button
@@ -185,6 +342,7 @@ const Nav = ({ user }: { user: IUser }) => {
           </motion.div>
         )}
       </AnimatePresence>
+      {SideBar}
     </nav>
   );
 };
