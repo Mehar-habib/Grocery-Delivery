@@ -5,9 +5,11 @@ import { ArrowRight, Bike, User, UserCog, Phone, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { motion } from "motion/react";
+import { useSession } from "next-auth/react";
 
 const EditRoleAndMobile = () => {
   const router = useRouter();
+  const { update } = useSession();
 
   const roles = [
     { id: "admin", label: "Admin", icon: UserCog },
@@ -28,6 +30,7 @@ const EditRoleAndMobile = () => {
         role: selectedRole,
         mobile,
       });
+      await update({ role: selectedRole });
       router.push("/");
     } catch (error) {
       console.error(error);

@@ -57,12 +57,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
 
     // token k ander user ka data dalta hai
-    jwt({ token, user }) {
+    jwt({ token, user, trigger, session }) {
       if (user) {
         token.id = user.id;
         token.name = user.name;
         token.email = user.email;
         token.role = user.role;
+      }
+      if (trigger === "update") {
+        token.role = session.role;
       }
       return token;
     },
