@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import React, { FormEvent, useState } from "react";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 import googleImage from "../../assets/google.png";
 import { useRouter } from "next/navigation";
 import { signIn, useSession } from "next-auth/react";
