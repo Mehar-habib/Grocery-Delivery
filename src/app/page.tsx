@@ -4,6 +4,9 @@ import User from "@/models/user.model";
 import { redirect } from "next/navigation";
 import EditRoleAndMobile from "@/components/EditRoleAndMobile";
 import Nav from "@/components/Nav";
+import UserDashboard from "@/components/UserDashboard";
+import AdminDashboard from "@/components/AdminDashboard";
+import DeliverBoyDashboard from "@/components/DeliverBoyDashboard";
 
 export default async function Home() {
   await connectDB();
@@ -21,6 +24,13 @@ export default async function Home() {
   return (
     <>
       <Nav user={planUser} />
+      {user.role == "user" ? (
+        <UserDashboard />
+      ) : user.role == "admin" ? (
+        <AdminDashboard />
+      ) : (
+        <DeliverBoyDashboard />
+      )}
     </>
   );
 }

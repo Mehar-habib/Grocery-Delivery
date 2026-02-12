@@ -94,16 +94,16 @@ const EditRoleAndMobile = () => {
           <input
             type="tel"
             placeholder="03001234567"
-            maxLength={10}
+            maxLength={11}
             value={mobile}
             onChange={(e) => setMobile(e.target.value.replace(/\D/g, ""))}
             className="w-full outline-none bg-transparent text-sm text-black"
           />
         </div>
 
-        {mobile.length > 0 && mobile.length !== 10 && (
+        {mobile.length > 0 && mobile.length !== 11 && (
           <p className="text-xs text-red-500 mt-2">
-            Mobile number must be 10 digits
+            Mobile number must be 11 digits
           </p>
         )}
       </motion.div>
