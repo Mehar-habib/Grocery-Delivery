@@ -191,7 +191,7 @@ const Nav = ({ user }: { user: IUser }) => {
 
               {/* Cart */}
               <Link
-                href="/cart"
+                href="/user/cart"
                 className="relative text-gray-600 hover:text-green-600 transition"
               >
                 <ShoppingCart size={22} />
