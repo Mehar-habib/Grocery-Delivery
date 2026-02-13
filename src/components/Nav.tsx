@@ -19,6 +19,8 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import mongoose from "mongoose";
 import { createPortal } from "react-dom";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
 
 interface IUser {
   _id?: mongoose.Types.ObjectId;
@@ -35,6 +37,7 @@ const Nav = ({ user }: { user: IUser }) => {
   const [searchBarOpen, setSearchBarOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const profileDropDown = useRef<HTMLDivElement>(null);
+  const { cartData } = useSelector((state: RootState) => state.cart);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -193,7 +196,7 @@ const Nav = ({ user }: { user: IUser }) => {
               >
                 <ShoppingCart size={22} />
                 <span className="absolute -top-2 -right-2 text-xs bg-green-600 text-white rounded-full px-1.5 py-0.5">
-                  0
+                  {cartData.length}
                 </span>
               </Link>
             </>
