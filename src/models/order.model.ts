@@ -13,7 +13,7 @@ interface IOrder {
       quantity: number;
     },
   ];
-  totalAmount: string;
+  totalAmount: number;
   paymentMethod: "cod" | "online";
   address: {
     fullName: string;
@@ -71,6 +71,9 @@ const orderSchema = new Schema<IOrder>(
       type: String,
       enum: ["pending", "out for delivery", "delivered"],
       default: "pending",
+    },
+    totalAmount: {
+      type: Number,
     },
   },
   {

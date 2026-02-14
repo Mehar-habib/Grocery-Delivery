@@ -37,7 +37,7 @@ const markerIcon = new L.Icon({
 const Checkout = () => {
   const router = useRouter();
   const { userData } = useSelector((state: RootState) => state.user);
-  const { subTotal, deliveryFee, finalTotal } = useSelector(
+  const { subTotal, deliveryFee, finalTotal, cartData } = useSelector(
     (state: RootState) => state.cart,
   );
   const [address, setAddress] = useState({
@@ -129,6 +129,38 @@ const Checkout = () => {
     fetchAddress();
   }, [position]);
 
+  const handleCOD = async () => {
+    if (!position) return null;
+    try {
+      const result = await axios.post("/api/user/order", {
+        userId: userData?._id,
+        items: cartData.map((item) => ({
+          grocery: item._id,
+          name: item.name,
+          price: item.price,
+          unit: item.unit,
+          image: item.image,
+          quantity: item.quantity,
+        })),
+        totalAmount: finalTotal,
+        address: {
+          fullName: address.fullName,
+          mobile: address.mobile,
+          city: address.city,
+          state: address.state,
+          pincode: address.pincode,
+          fullAddress: address.fullAddress,
+          latitude: position[0],
+          longitude: position[1],
+        },
+        paymentMethod,
+      });
+      console.log(result);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const handleCurrentLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -140,15 +172,6 @@ const Checkout = () => {
         { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 },
       );
     }
-  };
-
-  const handlePlaceOrder = async () => {
-    setIsPlacingOrder(true);
-    // Simulate order placement
-    setTimeout(() => {
-      setIsPlacingOrder(false);
-      router.push("/order-success");
-    }, 2000);
   };
 
   const isAddressComplete = () => {
@@ -589,7 +612,14 @@ const Checkout = () => {
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  onClick={handlePlaceOrder}
+                  onClick={() => {
+                    if (paymentMethod === "cod") {
+                      handleCOD();
+                    } else {
+                      null;
+                      // handleOnlineOrder()
+                    }
+                  }}
                   disabled={!isAddressComplete() || isPlacingOrder}
                   className={`w-full py-4 rounded-xl font-semibold text-lg transition-all flex items-center justify-center gap-2 ${
                     isAddressComplete() && !isPlacingOrder
@@ -609,7 +639,7 @@ const Checkout = () => {
                   )}
                 </motion.button>
                 {!isAddressComplete() && (
-                  <p className="text-xs text-gray-500 text-center mt-2">
+                  <p className="text-xs text-red-500 font-semibold text-center mt-2">
                     Please complete all address fields to continue
                   </p>
                 )}
