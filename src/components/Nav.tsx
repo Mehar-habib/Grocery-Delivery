@@ -295,7 +295,7 @@ const Nav = ({ user }: { user: IUser }) => {
                   {/* Orders */}
                   {user.role === "user" && (
                     <Link
-                      href="/orders"
+                      href="/user/my-order"
                       onClick={() => setOpen(false)}
                       className="flex items-center gap-2 text-gray-600 hover:text-green-600 transition"
                     >
