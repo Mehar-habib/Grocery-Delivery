@@ -13,6 +13,7 @@ interface IOrder {
       quantity: number;
     },
   ];
+  isPaid: boolean;
   totalAmount: number;
   paymentMethod: "cod" | "online";
   address: {
@@ -74,6 +75,10 @@ const orderSchema = new Schema<IOrder>(
     },
     totalAmount: {
       type: Number,
+    },
+    isPaid: {
+      type: Boolean,
+      default: false,
     },
   },
   {
