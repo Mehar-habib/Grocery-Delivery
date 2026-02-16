@@ -1,5 +1,6 @@
 "use client";
 import { IOrder } from "@/models/order.model";
+import axios from "axios";
 import {
   ChevronDown,
   ChevronUp,
@@ -23,7 +24,21 @@ import { useState } from "react";
 
 const AdminOrderCard = ({ order }: { order: IOrder }) => {
   const [expanded, setExpanded] = useState(false);
-  const [selectedStatus, setSelectedStatus] = useState(order.status);
+  const [status, setStatus] = useState<string>(order.status);
+
+  const updateStatus = async (orderId: string, status: string) => {
+    try {
+      const result = await axios.post(
+        `/api/admin/update-order-status/${orderId}`,
+        {
+          status,
+        },
+      );
+      setStatus(status);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const statusOptions = [
     "pending",
@@ -114,17 +129,19 @@ const AdminOrderCard = ({ order }: { order: IOrder }) => {
           <div className="flex items-center gap-3">
             {/* Current Status Badge */}
             <div
-              className={`px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2 border ${getStatusColor(selectedStatus)}`}
+              className={`px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2 border ${getStatusColor(status)}`}
             >
-              {getStatusIcon(selectedStatus)}
-              {selectedStatus}
+              {getStatusIcon(status)}
+              {status}
             </div>
 
             {/* Status Update Dropdown */}
             <div className="relative">
               <select
-                value={selectedStatus}
-                onChange={(e) => setSelectedStatus(e.target.value)}
+                value={order.status}
+                onChange={(e) =>
+                  updateStatus(order._id?.toString()!, e.target.value)
+                }
                 className="appearance-none bg-white border-2 border-gray-200 hover:border-green-500 rounded-xl px-4 py-2 pr-10 font-medium text-gray-700 focus:outline-none focus:border-green-500 focus:ring-4 focus:ring-green-100 transition-all cursor-pointer"
               >
                 {statusOptions.map((status) => (
@@ -327,9 +344,9 @@ const AdminOrderCard = ({ order }: { order: IOrder }) => {
           <div className="flex items-center gap-2 text-sm text-gray-500">
             <Truck className="w-4 h-4 text-green-600" />
             <span>
-              {selectedStatus === "delivered"
+              {status === "delivered"
                 ? "Delivered on " + formatDate(order.updatedAt!)
-                : selectedStatus === "cancelled"
+                : status === "cancelled"
                   ? "Order cancelled"
                   : "Estimated delivery: Today"}
             </span>
