@@ -9,7 +9,7 @@ import {
   Mail,
 } from "lucide-react";
 import Image from "next/image";
-import React, { FormEvent, useState } from "react";
+import React, { FormEvent, useEffect, useState } from "react";
 import { motion } from "motion/react";
 import googleImage from "../../assets/google.png";
 import { useRouter } from "next/navigation";
@@ -24,18 +24,26 @@ const Login = () => {
   const router = useRouter();
   const session = useSession();
   console.log(session);
+  useEffect(() => {
+    if (status === "authenticated") {
+      router.replace("/");
+    }
+  }, [status, router]);
   const formValidation = email !== "" && password !== "";
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
-      await signIn("credentials", {
+      const result = await signIn("credentials", {
         email,
         password,
+        redirect: false,
       });
-      router.push("/");
-      setLoading(false);
+      if (!result?.error) {
+        router.replace("/");
+      }
+      // setLoading(false);
     } catch (error) {
       console.error(error);
       setLoading(false);

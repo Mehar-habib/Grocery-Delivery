@@ -3,7 +3,7 @@
 import axios from "axios";
 import { ArrowRight, Bike, User, UserCog, Phone, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { useSession } from "next-auth/react";
 
@@ -11,12 +11,11 @@ const EditRoleAndMobile = () => {
   const router = useRouter();
   const { update } = useSession();
 
-  const roles = [
+  const [roles, setRoles] = useState([
     { id: "admin", label: "Admin", icon: UserCog },
     { id: "user", label: "User", icon: User },
     { id: "deliveryBoy", label: "Delivery Boy", icon: Bike },
-  ];
-
+  ]);
   const [selectedRole, setSelectedRole] = useState("");
   const [mobile, setMobile] = useState("");
   const [loading, setLoading] = useState(false);
@@ -40,6 +39,19 @@ const EditRoleAndMobile = () => {
   };
 
   const isValid = selectedRole && mobile.length === 11;
+  useEffect(() => {
+    const checkForAdmin = async () => {
+      try {
+        const result = await axios.get("/api/check-for-admin");
+        if (result.data.adminExist) {
+          setRoles((prev) => prev.filter((role) => role.id !== "admin"));
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    checkForAdmin();
+  }, []);
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-green-50 via-white to-orange-50 px-6 py-10">
