@@ -8,9 +8,9 @@ export async function GET(req: NextApiRequest) {
   try {
     await connectDB();
     const session = await auth();
-    const orders = await Order.find({ user: session?.user?.id }).populate(
-      "user",
-    );
+    const orders = await Order.find({ user: session?.user?.id })
+      .populate("user")
+      .sort({ createdAt: -1 });
     if (!orders) {
       return NextResponse.json(
         { message: "Orders not found" },
