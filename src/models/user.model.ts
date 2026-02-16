@@ -19,6 +19,8 @@ interface IUser {
       default: number[];
     };
   };
+  socketId: string | null;
+  isOnline: boolean;
 }
 const userSchema = new Schema<IUser>(
   {
@@ -57,6 +59,14 @@ const userSchema = new Schema<IUser>(
         type: [Number],
         default: [0, 0],
       },
+    },
+    socketId: {
+      type: String,
+      default: null,
+    },
+    isOnline: {
+      type: Boolean,
+      default: false,
     },
   },
   {
