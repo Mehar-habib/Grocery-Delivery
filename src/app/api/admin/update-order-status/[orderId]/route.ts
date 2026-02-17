@@ -6,11 +6,11 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { orderId: string } },
+  context: { params: Promise<{ orderId: string }> },
 ) {
   try {
     await connectDB();
-    const { orderId } = await params;
+    const { orderId } = await context.params;
     const { status } = await req.json();
     const order = await Order.findById(orderId).populate("user");
     if (!order) {
@@ -18,7 +18,7 @@ export async function POST(
     }
     order.status = status;
     let deliveryBoysPayload: any = [];
-    if (status === "out of delivery" && !order.assignment) {
+    if (status === "out for delivery" && !order.assignment) {
       const { latitude, longitude } = order.address;
       const nearByDeliveryBoys = await User.find({
         role: "deliveryBoy",
@@ -28,14 +28,14 @@ export async function POST(
               type: "Point",
               coordinates: [Number(longitude), Number(latitude)],
             },
-            maxDistance: 10000,
+            $maxDistance: 10000,
           },
         },
       });
       const nearByIds = nearByDeliveryBoys.map((b) => b._id);
       const busyIds = await DeliveryAssignment.find({
         assignedTo: { $in: nearByIds },
-        status: { $nin: ["brocasted", "completed"] },
+        status: { $nin: ["brodcasted", "completed"] },
       }).distinct("assignedTo");
 
       const busyIdSet = new Set(busyIds.map((b) => String(b)));
@@ -52,8 +52,8 @@ export async function POST(
       }
       const deliveryAssignment = await DeliveryAssignment.create({
         order: order._id,
-        broadcastedTo: candidates,
-        status: "brocasted",
+        brodcastedTo: candidates,
+        status: "brodcasted",
       });
       order.assignment = deliveryAssignment._id;
       deliveryBoysPayload = availableDeliveryBoys.map((b) => ({
@@ -73,6 +73,7 @@ export async function POST(
       { status: 200 },
     );
   } catch (error) {
+    console.log("FULL ERROR:", error);
     return NextResponse.json(
       { message: `Something went wrong ${error}` },
       { status: 500 },

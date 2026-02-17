@@ -1,11 +1,11 @@
 import mongoose, { Schema } from "mongoose";
 
-interface IDeliveryAssignment {
+export interface IDeliveryAssignment {
   _id?: mongoose.Types.ObjectId;
   order: mongoose.Types.ObjectId;
-  broadcastedTo: mongoose.Types.ObjectId[];
+  brodcastedTo: mongoose.Types.ObjectId[];
   assignedTo: mongoose.Types.ObjectId | null;
-  status: "brocasted" | "assigned" | "completed";
+  status: "brodcasted" | "assigned" | "completed";
   accepted: Date;
   createdAt?: Date;
   updatedAt?: Date;
@@ -18,7 +18,7 @@ const deliveryAssignmentSchema = new Schema<IDeliveryAssignment>(
       ref: "Order",
       required: true,
     },
-    broadcastedTo: [
+    brodcastedTo: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
@@ -30,8 +30,8 @@ const deliveryAssignmentSchema = new Schema<IDeliveryAssignment>(
     },
     status: {
       type: String,
-      enum: ["brocasted", "assigned", "completed"],
-      default: "brocasted",
+      enum: ["brodcasted", "assigned", "completed"],
+      default: "brodcasted",
     },
     accepted: Date,
   },

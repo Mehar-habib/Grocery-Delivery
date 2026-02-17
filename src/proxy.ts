@@ -20,7 +20,7 @@ export async function proxy(req: NextRequest) {
   if (pathname.startsWith("/admin") && role !== "admin") {
     return NextResponse.redirect(new URL("/unauthorized", req.url));
   }
-  if (pathname.startsWith("/deliveryBoy") && role !== "deliveryBoy") {
+  if (pathname.startsWith("/delivery") && role !== "deliveryBoy") {
     return NextResponse.redirect(new URL("/unauthorized", req.url));
   }
 

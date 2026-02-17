@@ -6,8 +6,8 @@ import EditRoleAndMobile from "@/components/EditRoleAndMobile";
 import Nav from "@/components/Nav";
 import UserDashboard from "@/components/UserDashboard";
 import AdminDashboard from "@/components/AdminDashboard";
-import DeliverBoyDashboard from "@/components/DeliverBoyDashboard";
 import GeoUpdater from "@/components/GeoUpdater";
+import DeliveryBoy from "@/components/DeliveryBoy";
 
 export default async function Home() {
   await connectDB();
@@ -31,7 +31,7 @@ export default async function Home() {
       ) : user.role == "admin" ? (
         <AdminDashboard />
       ) : (
-        <DeliverBoyDashboard />
+        <DeliveryBoy />
       )}
     </>
   );
