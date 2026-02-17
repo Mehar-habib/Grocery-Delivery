@@ -13,6 +13,7 @@ import {
   Filter,
 } from "lucide-react";
 import AdminOrderCard from "@/components/AdminOrderCard";
+import { getSocket } from "@/lib/socket";
 
 const ManageOrder = () => {
   const [orders, setOrders] = useState<IOrder[]>();
@@ -32,6 +33,14 @@ const ManageOrder = () => {
       }
     };
     getOrders();
+  }, []);
+
+  useEffect((): any => {
+    const socket = getSocket();
+    socket.on("new-order", (newOrder) => {
+      setOrders((prevOrders) => [newOrder, ...prevOrders!]);
+    });
+    return () => socket.off("new-order");
   }, []);
 
   const getStatusCount = (status: string) => {

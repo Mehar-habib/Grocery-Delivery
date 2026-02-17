@@ -10,6 +10,7 @@ import {
   CheckCircle,
   XCircle,
 } from "lucide-react";
+import { getSocket } from "@/lib/socket";
 
 const DeliverBoyDashboard = () => {
   const [assignments, setAssignments] = useState<any[]>([]);
@@ -29,6 +30,14 @@ const DeliverBoyDashboard = () => {
     fetchAssignments();
   }, []);
 
+  useEffect((): any => {
+    const socket = getSocket();
+
+    socket.on("new-assignment", (deliveryAssignment) => {
+      setAssignments((prev) => [...prev, deliveryAssignment]);
+    });
+    return () => socket.off("new-assignment");
+  }, []);
   // const handleAccept = async (assignmentId: string) => {
   //   try {
   //     await axios.post(`/api/delivery/accept/${assignmentId}`);

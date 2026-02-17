@@ -1,4 +1,5 @@
 "use client";
+import { getSocket } from "@/lib/socket";
 import { IOrder } from "@/models/order.model";
 import {
   ChevronDown,
@@ -18,9 +19,10 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const UserOrderCard = ({ order }: { order: IOrder }) => {
+  const [status, setStatus] = useState(order.status);
   const [expanded, setExpanded] = useState(false);
 
   const getStatusColor = (status: string) => {
@@ -52,6 +54,15 @@ const UserOrderCard = ({ order }: { order: IOrder }) => {
         return <Clock className="w-4 h-4" />;
     }
   };
+  useEffect((): any => {
+    const socket = getSocket();
+    socket.on("order-status-update", (data) => {
+      if (data.orderId.toString() === order?._id!.toString()) {
+        setStatus(data.status);
+      }
+    });
+    return () => socket.off("order-status-update");
+  }, []);
 
   const formatDate = (date: Date) => {
     return new Date(date).toLocaleDateString("en-US", {
@@ -117,10 +128,10 @@ const UserOrderCard = ({ order }: { order: IOrder }) => {
             {/* Order Status */}
             <motion.div
               whileHover={{ scale: 1.05 }}
-              className={`px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2 border ${getStatusColor(order.status)}`}
+              className={`px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2 border ${getStatusColor(status)}`}
             >
-              {getStatusIcon(order.status)}
-              {order.status}
+              {getStatusIcon(status)}
+              {status}
             </motion.div>
           </div>
         </div>
@@ -274,14 +285,12 @@ const UserOrderCard = ({ order }: { order: IOrder }) => {
           <div className="flex items-center gap-3">
             <div
               className={`p-2 rounded-lg ${
-                order.status === "delivered" ? "bg-green-100" : "bg-blue-100"
+                status === "delivered" ? "bg-green-100" : "bg-blue-100"
               }`}
             >
               <Truck
                 className={`w-5 h-5 ${
-                  order.status === "delivered"
-                    ? "text-green-600"
-                    : "text-blue-600"
+                  status === "delivered" ? "text-green-600" : "text-blue-600"
                 }`}
               />
             </div>
@@ -290,9 +299,9 @@ const UserOrderCard = ({ order }: { order: IOrder }) => {
                 Delivery Status
               </p>
               <p className="text-xs text-gray-500">
-                {order.status === "delivered"
+                {status === "delivered"
                   ? "Delivered on " + formatDate(order.updatedAt!)
-                  : order.status === "out for delivery"
+                  : status === "out for delivery"
                     ? "Out for delivery • Expected today"
                     : "Processing your order"}
               </p>
