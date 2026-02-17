@@ -38,14 +38,18 @@ const DeliverBoyDashboard = () => {
     });
     return () => socket.off("new-assignment");
   }, []);
-  // const handleAccept = async (assignmentId: string) => {
-  //   try {
-  //     await axios.post(`/api/delivery/accept/${assignmentId}`);
-  //     setAssignments((prev) => prev.filter((a) => a._id !== assignmentId));
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // };
+
+  const handleAccept = async (id: string) => {
+    try {
+      const result = await axios.get(
+        `/api/delivery/assignment/${id}/accept-assignment`,
+      );
+      console.log(result);
+      // setAssignments((prev) => prev.filter((a) => a._id !== id));
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   // const handleReject = async (assignmentId: string) => {
   //   try {
@@ -165,7 +169,7 @@ const DeliverBoyDashboard = () => {
                   {/* Action Buttons */}
                   <div className="flex gap-2 pt-2">
                     <button
-                      // onClick={() => handleAccept(assignment._id)}
+                      onClick={() => handleAccept(assignment._id)}
                       className="flex-1 bg-green-600 text-white py-2.5 rounded-lg text-sm font-medium hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
                     >
                       <CheckCircle className="w-4 h-4" />
