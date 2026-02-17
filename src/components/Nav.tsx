@@ -119,7 +119,7 @@ const Nav = ({ user }: { user: IUser }) => {
               </Link>
 
               <Link
-                href=""
+                href="#"
                 className="flex items-center gap-3 px-4 py-3 rounded-xl
               bg-white/5 hover:bg-white/15 transition-all duration-200"
               >
@@ -128,7 +128,7 @@ const Nav = ({ user }: { user: IUser }) => {
               </Link>
 
               <Link
-                href=""
+                href="#"
                 className="flex items-center gap-3 px-4 py-3 rounded-xl
               bg-white/5 hover:bg-white/15 transition-all duration-200"
               >
@@ -213,7 +213,7 @@ const Nav = ({ user }: { user: IUser }) => {
                   Add Grocery
                 </Link>
                 <Link
-                  href={""}
+                  href="#"
                   className="flex items-center gap-2 bg-white text-green-700 font-semibold px-4 py-2 rounded-full hover:bg-green-100 transition-all"
                 >
                   <Boxes className="h-5 w-5" />

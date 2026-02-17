@@ -1,5 +1,4 @@
 "use client";
-import { IOrder } from "@/models/order.model";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
@@ -14,6 +13,41 @@ import {
 } from "lucide-react";
 import AdminOrderCard from "@/components/AdminOrderCard";
 import { getSocket } from "@/lib/socket";
+import mongoose from "mongoose";
+import { IUser } from "@/models/user.model";
+
+interface IOrder {
+  _id?: mongoose.Types.ObjectId;
+  user: mongoose.Types.ObjectId;
+  items: [
+    {
+      grocery: mongoose.Types.ObjectId;
+      name: string;
+      price: string;
+      unit: string;
+      image: string;
+      quantity: number;
+    },
+  ];
+  isPaid: boolean;
+  totalAmount: number;
+  paymentMethod: "cod" | "online";
+  address: {
+    fullName: string;
+    mobile: string;
+    city: string;
+    state: string;
+    pincode: string;
+    fullAddress: string;
+    latitude: number;
+    longitude: number;
+  };
+  assignment?: mongoose.Types.ObjectId;
+  assignedDeliveryBoy?: IUser;
+  status: "pending" | "out for delivery" | "delivered";
+  createdAt?: Date;
+  updatedAt?: Date;
+}
 
 const ManageOrder = () => {
   const [orders, setOrders] = useState<IOrder[]>();
@@ -245,7 +279,7 @@ const ManageOrder = () => {
                   transition={{ duration: 0.3, delay: index * 0.1 }}
                   layout
                 >
-                  <AdminOrderCard order={order} />
+                  <AdminOrderCard key={index} order={order} />
                 </motion.div>
               ))}
             </div>
