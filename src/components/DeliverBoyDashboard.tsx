@@ -11,24 +11,26 @@ import {
   XCircle,
 } from "lucide-react";
 import { getSocket } from "@/lib/socket";
+import { RootState } from "@/redux/store";
+import { useSelector } from "react-redux";
 
 const DeliverBoyDashboard = () => {
+  const { userData } = useSelector((state: RootState) => state.user);
   const [assignments, setAssignments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeOrder, setActiveOrder] = useState<any>(null);
+  const [userLocation, setUserLocation] = useState<any>(null);
 
-  useEffect(() => {
-    const fetchAssignments = async () => {
-      try {
-        const result = await axios.get("/api/delivery/get-assignments");
-        setAssignments(result.data);
-        setLoading(false);
-      } catch (error) {
-        console.error(error);
-        setLoading(false);
-      }
-    };
-    fetchAssignments();
-  }, []);
+  const fetchAssignments = async () => {
+    try {
+      const result = await axios.get("/api/delivery/get-assignments");
+      setAssignments(result.data);
+      setLoading(false);
+    } catch (error) {
+      console.error(error);
+      setLoading(false);
+    }
+  };
 
   useEffect((): any => {
     const socket = getSocket();
@@ -51,14 +53,25 @@ const DeliverBoyDashboard = () => {
     }
   };
 
-  // const handleReject = async (assignmentId: string) => {
-  //   try {
-  //     await axios.post(`/api/delivery/reject/${assignmentId}`);
-  //     setAssignments((prev) => prev.filter((a) => a._id !== assignmentId));
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // };
+  const fetchCurrentOrder = async () => {
+    try {
+      const result = await axios.get("/api/delivery/current-order");
+      if (result.data.active) {
+        setActiveOrder(result.data.assignment);
+        setUserLocation({
+          latitude: result.data.assignment.order.address.latitude,
+          longitude: result.data.assignment.order.address.longitude,
+        });
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchCurrentOrder();
+    fetchAssignments();
+  }, [userData]);
 
   const formatTime = (date: string) => {
     const diffMinutes = Math.floor(
@@ -68,7 +81,21 @@ const DeliverBoyDashboard = () => {
       ? `${diffMinutes} min ago`
       : `${Math.floor(diffMinutes / 60)} hr ago`;
   };
-
+  if (activeOrder && userLocation) {
+    return (
+      <div className="p-4 pt-32 min-h-screen bg-gray-50">
+        <div className="max-w-3xl mx-auto">
+          <h1 className="text-2xl font-bold text-green-700 mb-4">
+            Active Delivery
+          </h1>
+          <p className="text-gray-600 text-sm mb-4">
+            order# {activeOrder.order._id.slice(-6)}
+          </p>
+          <div className="rounded-xl border shadow-lg overflow-hidden mb-6"></div>
+        </div>
+      </div>
+    );
+  }
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
