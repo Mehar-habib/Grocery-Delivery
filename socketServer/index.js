@@ -35,6 +35,7 @@ io.on("connection", (socket) => {
         location,
       },
     );
+    io.emit("update-deliverBoy-location", { userId, location });
   });
 
   socket.on("disconnect", () => {
