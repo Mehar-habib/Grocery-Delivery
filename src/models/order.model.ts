@@ -31,6 +31,9 @@ export interface IOrder {
   status: "pending" | "out for delivery" | "delivered";
   createdAt?: Date;
   updatedAt?: Date;
+  deliveryOtp: string | null;
+  deliveryOtpVerification: boolean;
+  deliveredAt: Date;
 }
 
 const orderSchema = new Schema<IOrder>(
@@ -90,6 +93,17 @@ const orderSchema = new Schema<IOrder>(
     isPaid: {
       type: Boolean,
       default: false,
+    },
+    deliveryOtp: {
+      type: String,
+      default: null,
+    },
+    deliveryOtpVerification: {
+      type: Boolean,
+      default: false,
+    },
+    deliveredAt: {
+      type: Date,
     },
   },
   {

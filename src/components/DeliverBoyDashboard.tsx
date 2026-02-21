@@ -33,6 +33,9 @@ const DeliverBoyDashboard = () => {
     latitude: 0,
     longitude: 0,
   });
+  const [showOtpBox, setShowOtpBox] = useState(false);
+  const [otp, setOtp] = useState("");
+  const [otpError, setOtpError] = useState("");
 
   const fetchAssignments = async () => {
     try {
@@ -111,6 +114,36 @@ const DeliverBoyDashboard = () => {
     fetchAssignments();
   }, [userData]);
 
+  const sendOtp = async () => {
+    setLoading(true);
+    try {
+      const result = await axios.post("/api/delivery/otp/send", {
+        orderId: activeOrder.order._id,
+      });
+      setShowOtpBox(true);
+      setLoading(false);
+    } catch (error) {
+      console.error(error);
+      setLoading(false);
+    }
+  };
+
+  const VerifyOtp = async () => {
+    setLoading(true);
+    try {
+      const result = await axios.post("/api/delivery/otp/verify", {
+        orderId: activeOrder.order._id,
+        otp,
+      });
+      setActiveOrder(null);
+      setLoading(false);
+      await fetchCurrentOrder();
+    } catch (error) {
+      setOtpError("Invalid OTP");
+      setLoading(false);
+    }
+  };
+
   const formatTime = (date: string) => {
     const diffMinutes = Math.floor(
       (new Date().getTime() - new Date(date).getTime()) / (1000 * 60),
@@ -139,6 +172,45 @@ const DeliverBoyDashboard = () => {
             orderId={activeOrder.order._id}
             deliveryBoyId={userData?._id!}
           />
+          {/* mark as delivered button */}
+          <div className="mt-6 bg-white rounded-xl border p-6">
+            {!activeOrder.order.deliveryOtpVerification && !showOtpBox && (
+              <button
+                onClick={sendOtp}
+                disabled={loading}
+                className="w-full py-4 bg-green-600 text-white rounded-lg"
+              >
+                {loading ? "Sending OTP..." : "Mark as Delivered"}
+              </button>
+            )}
+            {showOtpBox && (
+              <div className="mt-4">
+                <input
+                  type="text"
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value)}
+                  placeholder="Enter OTP"
+                  maxLength={4}
+                  className="w-full py-3 border rounded-lg text-center"
+                />
+                <button
+                  onClick={VerifyOtp}
+                  disabled={loading}
+                  className="w-full mt-4 bg-orange-600 py-3 text-white rounded-lg"
+                >
+                  {loading ? "Verifying..." : "Verify OTP"}
+                </button>
+                {otpError && (
+                  <div className="text-red-500 mt-2">${otpError}</div>
+                )}
+              </div>
+            )}
+            {activeOrder.order.deliveryOtpVerification && (
+              <div className="text-green-700 text-center font-bold">
+                Delivery completed!
+              </div>
+            )}
+          </div>
         </div>
       </div>
     );
