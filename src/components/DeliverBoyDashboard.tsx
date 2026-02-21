@@ -14,6 +14,7 @@ import { getSocket } from "@/lib/socket";
 import { RootState } from "@/redux/store";
 import { useSelector } from "react-redux";
 import LiveMap from "./LiveMap";
+import DeliveryChat from "./DeliveryChat";
 
 interface ILocation {
   latitude: number;
@@ -134,6 +135,10 @@ const DeliverBoyDashboard = () => {
               deliverBoyLocation={deliverBoyLocation}
             />
           </div>
+          <DeliveryChat
+            orderId={activeOrder.order._id}
+            deliveryBoyId={userData?._id!}
+          />
         </div>
       </div>
     );

@@ -1,5 +1,6 @@
 "use client";
 import LiveMap from "@/components/LiveMap";
+import DeliveryChat from "@/components/DeliveryChat";
 import { getSocket } from "@/lib/socket";
 import { IUser } from "@/models/user.model";
 import { RootState } from "@/redux/store";
@@ -14,6 +15,7 @@ import {
   IndianRupee,
   Phone,
   User,
+  MessageCircle,
 } from "lucide-react";
 import mongoose from "mongoose";
 import { useParams, useRouter } from "next/navigation";
@@ -59,12 +61,13 @@ interface ILocation {
   longitude: number;
 }
 
-const TrackOrder = ({ params }: { params: { orderId: string } }) => {
+const TrackOrder = () => {
   const { userData } = useSelector((state: RootState) => state.user);
   const { orderId } = useParams();
   const router = useRouter();
   const [order, setOrder] = useState<IOrder>();
   const [loading, setLoading] = useState(true);
+  const [showChat, setShowChat] = useState(false);
   const [userLocation, setUserLocation] = useState<ILocation>({
     latitude: 0,
     longitude: 0,
@@ -153,7 +156,7 @@ const TrackOrder = ({ params }: { params: { orderId: string } }) => {
             Order Not Found
           </h2>
           <p className="text-gray-600 mb-4">
-            The order you're looking for doesn't exist.
+            The order you&apos;re looking for doesn&apos;t exist.
           </p>
           <button
             onClick={() => router.back()}
@@ -177,27 +180,43 @@ const TrackOrder = ({ params }: { params: { orderId: string } }) => {
       {/* Header */}
       <div className="relative z-10 bg-white/80 backdrop-blur-xl border-b border-gray-200/50 sticky top-0">
         <div className="max-w-2xl mx-auto px-4 py-4">
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => router.back()}
-              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-            >
-              <ArrowLeft className="w-5 h-5 text-gray-600" />
-            </button>
-            <div>
-              <h1 className="text-xl font-semibold text-gray-800">
-                Track Order
-              </h1>
-              <p className="text-sm text-gray-500 flex items-center gap-2">
-                Order #{order._id?.toString().slice(-8).toUpperCase()}
-                <span
-                  className={`px-2 py-0.5 rounded-full text-xs font-medium flex items-center gap-1 ${getStatusColor(order.status)}`}
-                >
-                  {getStatusIcon(order.status)}
-                  {order.status}
-                </span>
-              </p>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => router.back()}
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              >
+                <ArrowLeft className="w-5 h-5 text-gray-600" />
+              </button>
+              <div>
+                <h1 className="text-xl font-semibold text-gray-800">
+                  Track Order
+                </h1>
+                <p className="text-sm text-gray-500 flex items-center gap-2">
+                  Order #{order._id?.toString().slice(-8).toUpperCase()}
+                  <span
+                    className={`px-2 py-0.5 rounded-full text-xs font-medium flex items-center gap-1 ${getStatusColor(order.status)}`}
+                  >
+                    {getStatusIcon(order.status)}
+                    {order.status}
+                  </span>
+                </p>
+              </div>
             </div>
+
+            {/* Chat Toggle Button */}
+            {order.assignedDeliveryBoy && (
+              <button
+                onClick={() => setShowChat(!showChat)}
+                className={`p-2 rounded-full transition-colors ${
+                  showChat
+                    ? "bg-green-600 text-white"
+                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                }`}
+              >
+                <MessageCircle className="w-5 h-5" />
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -215,6 +234,22 @@ const TrackOrder = ({ params }: { params: { orderId: string } }) => {
             deliverBoyLocation={deliverBoyLocation}
           />
         </motion.div>
+
+        {/* Chat Section */}
+        {showChat && order.assignedDeliveryBoy && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="mb-6"
+          >
+            <DeliveryChat
+              orderId={order._id!}
+              userId={userData?._id!}
+              userType="user"
+            />
+          </motion.div>
+        )}
 
         {/* Delivery Status Card */}
         <motion.div
@@ -310,9 +345,12 @@ const TrackOrder = ({ params }: { params: { orderId: string } }) => {
                   </p>
                 </div>
               </div>
-              <button className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition-colors">
-                Contact
-              </button>
+              <a
+                href={`tel:${order.assignedDeliveryBoy.mobile}`}
+                className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition-colors"
+              >
+                Call
+              </a>
             </div>
           </motion.div>
         )}
