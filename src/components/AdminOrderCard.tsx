@@ -1,4 +1,5 @@
 "use client";
+import { getSocket } from "@/lib/socket";
 import { IUser } from "@/models/user.model";
 import axios from "axios";
 import {
@@ -22,7 +23,7 @@ import {
 import mongoose from "mongoose";
 import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface IOrder {
   _id?: mongoose.Types.ObjectId;
@@ -74,7 +75,15 @@ const AdminOrderCard = ({ order }: { order: IOrder }) => {
       console.error(error);
     }
   };
-
+  useEffect((): any => {
+    const socket = getSocket();
+    socket.on("order-status-update", (data) => {
+      if (data.orderId.toString() === order?._id!.toString()) {
+        setStatus(data.status);
+      }
+    });
+    return () => socket.off("order-status-update");
+  }, []);
   const statusOptions = [
     "pending",
     "processing",
@@ -230,30 +239,32 @@ const AdminOrderCard = ({ order }: { order: IOrder }) => {
           </div>
 
           {/* Payment Method */}
-          <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
-            <p className="text-xs text-gray-500 mb-2">Payment</p>
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-white rounded-lg shadow-sm">
-                {order.paymentMethod === "cod" ? (
-                  <Wallet className="w-5 h-5 text-green-600" />
-                ) : (
-                  <CreditCard className="w-5 h-5 text-blue-600" />
-                )}
-              </div>
-              <div>
-                <p className="font-medium text-gray-800">
-                  {order.paymentMethod === "cod"
-                    ? "Cash on Delivery"
-                    : "Online Payment"}
-                </p>
-                <p
-                  className={`text-xs ${order.isPaid ? "text-green-600" : "text-orange-600"}`}
-                >
-                  {order.isPaid ? "Paid" : "Pending Payment"}
-                </p>
+          {status !== "delivered" && (
+            <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+              <p className="text-xs text-gray-500 mb-2">Payment</p>
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-white rounded-lg shadow-sm">
+                  {order.paymentMethod === "cod" ? (
+                    <Wallet className="w-5 h-5 text-green-600" />
+                  ) : (
+                    <CreditCard className="w-5 h-5 text-blue-600" />
+                  )}
+                </div>
+                <div>
+                  <p className="font-medium text-gray-800">
+                    {order.paymentMethod === "cod"
+                      ? "Cash on Delivery"
+                      : "Online Payment"}
+                  </p>
+                  <p
+                    className={`text-xs ${order.isPaid ? "text-green-600" : "text-orange-600"}`}
+                  >
+                    {order.isPaid ? "Paid" : "Pending Payment"}
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
           {/* Delivery Address Summary */}
           <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">

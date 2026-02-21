@@ -87,8 +87,7 @@ const DeliverBoyDashboard = () => {
       const result = await axios.get(
         `/api/delivery/assignment/${id}/accept-assignment`,
       );
-      console.log(result);
-      // setAssignments((prev) => prev.filter((a) => a._id !== id));
+      fetchCurrentOrder();
     } catch (error) {
       console.error(error);
     }

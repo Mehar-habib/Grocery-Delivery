@@ -69,12 +69,22 @@ const ManageOrder = () => {
     getOrders();
   }, []);
 
-  useEffect((): any => {
+  useEffect(() => {
     const socket = getSocket();
     socket.on("new-order", (newOrder) => {
       setOrders((prevOrders) => [newOrder, ...prevOrders!]);
     });
-    return () => socket.off("new-order");
+    socket.on("order-assigned", ({ orderId, assignedDeliveryBoy }) => {
+      setOrders((prevOrders) =>
+        prevOrders?.map((order) =>
+          order._id === orderId ? { ...order, assignedDeliveryBoy } : order,
+        ),
+      );
+    });
+    return () => {
+      socket.off("new-order");
+      socket.off("order-assigned");
+    };
   }, []);
 
   const getStatusCount = (status: string) => {

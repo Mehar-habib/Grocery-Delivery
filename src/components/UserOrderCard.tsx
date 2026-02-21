@@ -144,21 +144,23 @@ const UserOrderCard = ({ order }: { order: IOrder }) => {
           {/* Status and Payment Badges */}
           <div className="flex items-center gap-3">
             {/* Payment Status */}
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              className={`px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2 border ${
-                order.isPaid
-                  ? "bg-green-50 text-green-700 border-green-200"
-                  : "bg-orange-50 text-orange-700 border-orange-200"
-              }`}
-            >
-              {order.isPaid ? (
-                <CheckCircle className="w-4 h-4" />
-              ) : (
-                <Clock3 className="w-4 h-4" />
-              )}
-              {order.isPaid ? "Paid" : "Unpaid"}
-            </motion.div>
+            {status !== "delivered" && (
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                className={`px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2 border ${
+                  order.isPaid
+                    ? "bg-green-50 text-green-700 border-green-200"
+                    : "bg-orange-50 text-orange-700 border-orange-200"
+                }`}
+              >
+                {order.isPaid ? (
+                  <CheckCircle className="w-4 h-4" />
+                ) : (
+                  <Clock3 className="w-4 h-4" />
+                )}
+                {order.isPaid ? "Paid" : "Unpaid"}
+              </motion.div>
+            )}
 
             {/* Order Status */}
             <motion.div
