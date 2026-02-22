@@ -17,9 +17,15 @@ const UserDashboard = async ({ groceryList }: { groceryList: IGrocery[] }) => {
           Popular Grocery
         </h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
-          {planGrocery.map((item: any, index: number) => (
-            <GroceryItemCard key={index} item={item} />
-          ))}
+          {planGrocery && planGrocery.length > 0 ? (
+            planGrocery.map((item: any, index: number) => (
+              <GroceryItemCard key={index} item={item} />
+            ))
+          ) : (
+            <h2 className="col-span-full text-center text-gray-500 py-10">
+              No grocery items found
+            </h2>
+          )}
         </div>
       </div>
     </>
