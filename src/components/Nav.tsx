@@ -16,11 +16,12 @@ import { AnimatePresence, motion } from "motion/react";
 import { signOut } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import mongoose from "mongoose";
 import { createPortal } from "react-dom";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
+import { useRouter } from "next/navigation";
 
 interface IUser {
   _id?: mongoose.Types.ObjectId;
@@ -38,6 +39,8 @@ const Nav = ({ user }: { user: IUser }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const profileDropDown = useRef<HTMLDivElement>(null);
   const { cartData } = useSelector((state: RootState) => state.cart);
+  const [search, setSearch] = useState("");
+  const router = useRouter();
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -51,6 +54,17 @@ const Nav = ({ user }: { user: IUser }) => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  const handleSearch = (e: FormEvent) => {
+    e.preventDefault();
+    const query = search.trim();
+    if (!query) {
+      return router.push("/");
+    }
+    router.push(`/?q=${encodeURIComponent(query)}`);
+    setSearch("");
+    setSearchBarOpen(false);
+  };
 
   const SideBar = menuOpen
     ? createPortal(
@@ -167,12 +181,17 @@ const Nav = ({ user }: { user: IUser }) => {
 
         {/* Desktop Search */}
         {user.role === "user" && (
-          <form className="hidden md:flex items-center gap-3 bg-white/80 border border-gray-200 rounded-xl px-4 py-2 w-[350px] focus-within:ring-2 focus-within:ring-green-400 transition">
+          <form
+            className="hidden md:flex items-center gap-3 bg-white/80 border border-gray-200 rounded-xl px-4 py-2 w-[350px] focus-within:ring-2 focus-within:ring-green-400 transition"
+            onSubmit={handleSearch}
+          >
             <Search size={18} className="text-gray-400" />
             <input
               type="text"
               placeholder="Search groceries..."
               className="outline-none bg-transparent text-sm w-full"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
             />
           </form>
         )}
@@ -333,12 +352,16 @@ const Nav = ({ user }: { user: IUser }) => {
             className="fixed top-0 left-0 w-full bg-white shadow-lg p-4 flex items-center gap-3 z-50"
           >
             <Search className="text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search groceries..."
-              className="flex-1 outline-none"
-              autoFocus
-            />
+            <form onSubmit={handleSearch}>
+              <input
+                type="text"
+                placeholder="Search groceries..."
+                className="flex-1 outline-none"
+                autoFocus
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </form>
             <button onClick={() => setSearchBarOpen(false)}>
               <X />
             </button>

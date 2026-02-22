@@ -1,13 +1,13 @@
 import connectDB from "@/lib/db";
 import CategorySlider from "./CategorySlider";
 import HeroSection from "./HeroSection";
-import Grocery from "@/models/grocery.model";
+import Grocery, { IGrocery } from "@/models/grocery.model";
 import GroceryItemCard from "./GroceryItemCard";
 
-const UserDashboard = async () => {
+const UserDashboard = async ({ groceryList }: { groceryList: IGrocery[] }) => {
   await connectDB();
-  const groceries = await Grocery.find({});
-  const plainGroceries = JSON.parse(JSON.stringify(groceries));
+  const planGrocery = JSON.parse(JSON.stringify(groceryList));
+
   return (
     <>
       <HeroSection />
@@ -17,7 +17,7 @@ const UserDashboard = async () => {
           Popular Grocery
         </h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
-          {plainGroceries.map((item: any, index: number) => (
+          {planGrocery.map((item: any, index: number) => (
             <GroceryItemCard key={index} item={item} />
           ))}
         </div>
