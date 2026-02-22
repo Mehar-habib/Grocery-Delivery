@@ -9,6 +9,7 @@ import AdminDashboard from "@/components/AdminDashboard";
 import GeoUpdater from "@/components/GeoUpdater";
 import DeliveryBoy from "@/components/DeliveryBoy";
 import Grocery, { IGrocery } from "@/models/grocery.model";
+import Footer from "@/components/Footer";
 
 export default async function Home(props: {
   searchParams: Promise<{
@@ -54,6 +55,7 @@ export default async function Home(props: {
       ) : (
         <DeliveryBoy />
       )}
+      <Footer />
     </>
   );
 }
