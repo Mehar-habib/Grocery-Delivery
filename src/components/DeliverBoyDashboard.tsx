@@ -15,12 +15,22 @@ import { RootState } from "@/redux/store";
 import { useSelector } from "react-redux";
 import LiveMap from "./LiveMap";
 import DeliveryChat from "./DeliveryChat";
+import {
+  Bar,
+  BarChart,
+  Legend,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 
 interface ILocation {
   latitude: number;
   longitude: number;
 }
-const DeliverBoyDashboard = () => {
+
+const DeliverBoyDashboard = ({ earning }: { earning: number }) => {
   const { userData } = useSelector((state: RootState) => state.user);
   const [assignments, setAssignments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -56,6 +66,7 @@ const DeliverBoyDashboard = () => {
     });
     return () => socket.off("new-assignment");
   }, []);
+
   useEffect((): any => {
     const socket = getSocket();
     if (!userData?._id) return;
@@ -137,6 +148,7 @@ const DeliverBoyDashboard = () => {
       setActiveOrder(null);
       setLoading(false);
       await fetchCurrentOrder();
+      window.location.reload();
     } catch (error) {
       setOtpError("Invalid OTP");
       setLoading(false);
@@ -151,6 +163,7 @@ const DeliverBoyDashboard = () => {
       ? `${diffMinutes} min ago`
       : `${Math.floor(diffMinutes / 60)} hr ago`;
   };
+
   if (activeOrder && userLocation) {
     return (
       <div className="p-4 pt-32 min-h-screen bg-gray-50">
@@ -200,7 +213,7 @@ const DeliverBoyDashboard = () => {
                   {loading ? "Verifying..." : "Verify OTP"}
                 </button>
                 {otpError && (
-                  <div className="text-red-500 mt-2">${otpError}</div>
+                  <div className="text-red-500 mt-2">{otpError}</div>
                 )}
               </div>
             )}
@@ -214,6 +227,7 @@ const DeliverBoyDashboard = () => {
       </div>
     );
   }
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -224,6 +238,10 @@ const DeliverBoyDashboard = () => {
       </div>
     );
   }
+
+  const todayEarning = [
+    { name: "Today", earnings: earning, deliveries: earning / 150 },
+  ];
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -236,15 +254,48 @@ const DeliverBoyDashboard = () => {
 
       {/* Main Content */}
       <div className="max-w-3xl mx-auto px-4 py-2">
-        {assignments.length === 0 ? (
-          <div className="bg-white rounded-lg p-8 text-center shadow-sm">
-            <Package className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-            <h2 className="text-lg font-medium text-gray-800 mb-2">
-              No Orders Available
-            </h2>
-            <p className="text-sm text-gray-500">
-              Check back later for new deliveries
-            </p>
+        {!activeOrder && assignments.length === 0 ? (
+          <div className="flex items-center justify-center min-h-[60vh] bg-linear-to-b from-white to-green-50 p-6">
+            <div className="max-w-md w-full text-center">
+              <h2 className="text-2xl font-bold text-gray-800">
+                No Active Deliveries
+              </h2>
+              <p className="text-gray-500 mb-5">
+                Stay online to receive new orders
+              </p>
+              <div className="bg-white rounded-xl shadow-xl p-6">
+                <h2 className="font-medium text-green-700 mb-2">
+                  Today's Performance
+                </h2>
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={todayEarning}>
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Bar
+                      dataKey="earnings"
+                      name="Earnings (PKR)"
+                      fill="#22c55e"
+                    />
+                    <Bar
+                      dataKey="deliveries"
+                      name="Deliveries"
+                      fill="#3b82f6"
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+                <p className="mt-4 text-lg font-bold text-green-700">
+                  Rs. {earning || 0} Earned today
+                </p>
+                <button
+                  className="mt-4 w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg"
+                  onClick={() => window.location.reload()}
+                >
+                  Refresh Earning
+                </button>
+              </div>
+            </div>
           </div>
         ) : (
           <div className="space-y-4">
